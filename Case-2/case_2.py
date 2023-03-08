@@ -61,7 +61,8 @@ fig.update_layout(title = "Totaal aantal passagiers en slachtoffers", xaxis_titl
                  )
                   
 st.header("Slachtoffers door de jaren heen ")
-st.markdown("De grafiek geeft het totale aantal slachtoffers en passagiers door de jaren heen weer. De lijnen volgen logischerwijs hetzelfde patroon. Aan de grafiek is te zien dat voornamelijk aan het begin van luchtvaart geen overlevenden waren bij ongelukken. Daarnaast geeft de grafiek weer dat het aantal slachtoffers stijgt na de tweede wereldoorlog, omdat na de tweede wereldoorlog het aantal vluchten stijgt. In de laatste jaren is een daling van het aantal slachtoffers en ongelukken te zien sinds de veiligheid van vliegen een steeds belangrijker thema werd. ")
+st.text("Bronnon: https://www.agcs.allianz.com/news-and-insights/expert-risk-articles/how-aviation-safety-has-improved.html")
+st.markdown("De grafiek geeft het totale aantal slachtoffers en passagiers door de jaren heen weer. De lijnen volgen logischerwijs hetzelfde patroon. Aan de grafiek is te zien dat voornamelijk aan het begin van luchtvaart geen overlevenden waren bij ongelukken. De hoge aantallen vliegtuigongelukken en sterfgevallen in 1970 werden veroorzaakt door meerdere factoren, waaronder toegenomen luchtverkeer, weersgerelateerde problemen, menselijke fouten, apparatuurstoringen en veiligheidskwesties zoals kapingen en pogingen tot kaping. De afname van vliegtuigongelukken en sterfgevallen vanaf de jaren 2000 was te danken aan betere vliegtuigontwerpen, veiligheidstechnologieën, opleiding en certificeringsnormen voor piloten, luchtverkeersleidingssystemen, regelgeving en toezicht door luchtvaartautoriteiten, strengere veiligheidsprocedures van luchtvaartmaatschappijen (zoals onderhoudsinspecties, pre-flight checks en bemanningsnseheerpraktijken) en vooruitgang in weersvoorspellingen en communicatietechnologie.(How aviation safety has improved, z.d.)")
 st.plotly_chart(fig)                 
 
 
@@ -98,61 +99,6 @@ st.header("Slachtoffers ten opzichte van passagiers aantallen")
 st.markdown("Om een beeld te krijgen van het aantal dodelijke slachtoffers ten opzichte van de totale aantal passagiers, zijn de twee datasets samengevoegd. Voor de vergelijking zijn de jaren 2005-2009 gebruikt. De bovenste staafdiagram laat het aantal passagiers zien van dat jaar. Te zien is dat na 2005 het aantal passagiers stijgt tot ongeveer 30 miljoen passagiers in 2006. Na 2006 is de stijging aanzienlijk minder, tot in 2009 tot ongeveer 37 miljoen passagiers.  De onderste staafdiagram geeft het aantal dodelijk slachtoffers over dezelfde jaar weer. Goed te zien is dat het aantal dodelijk slachtoffers blijft dalen door de jaren heen terwijl het aantal passagiers stijgt. Dit laat zien dat er nog steeds veel geïnvesteerd wordt in de vliegveiligheid en het percentage van dodelijke slachtoffers onder de 1% zit. ")
 st.plotly_chart(fig2)
 
-
-
-# Top 10 aircraft tabel
-st.header("Top 10 vliegtuigen")
-st.markdown("De tabel laat de 10 meest voorkomende vliegtuigen in de dataset zien.")
-top_10_ac = acf_df["Type"].value_counts().iloc[0:10]
-st.write(top_10_ac)
-
-
-
-# alaric
-option = st.selectbox(
-    'Select yearly statistic',
-    ('Passengers', 'Flights'))
-
-st.write('You selected:', option)
-
-
-if option == 'Passengers':
-    fig = px.histogram(Air_Traffic,x='Year',y='Passenger Count')
-    st.plotly_chart(fig)
-elif option == 'Flights':
-    fig = px.histogram(Air_Traffic,x='Year')
-    st.plotly_chart(fig)
-
-# assign date
-def period_to_date(var):
-    period = str(var)
-    year = period[0:4]
-    month = period[4:]
-    return f"{year}-{month}"
-
-Air_Traffic['Date'] = pd.to_datetime(Air_Traffic['Activity Period'].apply(period_to_date))
-
-# passenger trends
-passenger_per_year = Air_Traffic.groupby(['Date','GEO Region']).sum()['Passenger Count']
-
-passenger_flights = {
-    'date':[],
-    'region':[],
-    'passengers':[],
-}
-for key in passenger_per_year.keys():
-    passenger_flights['date'].append(key[0])
-    passenger_flights['region'].append(key[1])
-    passenger_flights['passengers'].append(passenger_per_year[key])
-
-
-passenger_flights_df = pd.DataFrame(passenger_flights)
-
-
-fig = px.line(passenger_flights_df,x='date',y='passengers',color='region',markers=True,symbol='region')
-fig.update_traces(marker={'size': 10})
-st.plotly_chart(fig)
-st.title('Testing')
 st.header('Hoogste aantal slachtoffers per type vliegtuig en operators')
 
 import pandas as pd
@@ -172,7 +118,9 @@ print(type_fatalities)
 import plotly.express as px
 
 st.subheader("Type vliegtuig")
-
+# Top 10 aircraft tabel
+top_10_ac = acf_df["Type"].value_counts().iloc[0:10]
+st.write(top_10_ac)
 st.markdown("Er is te zien dat het type Douglas DC-3 de meeste slachtoffers had, in totaal waren dat 4793 personen. Als er gekeken wordt naar de top 4 type vliegtuifen, met de meeste slachtoffers boven 1000 personen, is er te zien dat alle vliegtuigen commerciele en militairen zijn. De vliegtuigen zijn voornamelijk voor militairen operaties gebruikt. Wat opvalt uit de visualisatie is dat er drie verschillende type vliegtuigen, met de meeste fatalities, van dezelfde vliegtuigbouwer zijn; Douglas. Dit zijn absolute waarden dus er is alleen naar de aantal slachtoffers gekeken en niet naar b.v. hoeveel vluchten ieder type vliegtuigen heeft uitgevoerd.")
 
 fig = px.bar(type_fatalities.query('Fatalities > 1000'),
@@ -289,5 +237,50 @@ ax.set(xlabel="Jaren", ylabel="Slachtoffers")
 st.pyplot(fig)
 
 st.header("Totaal aantal slachtoffers per jaar")
-st.text("Bronnon: https://www.agcs.allianz.com/news-and-insights/expert-risk-articles/how-aviation-safety-has-improved.html")
-st.markdown("De hoge aantallen vliegtuigongelukken en sterfgevallen in 1970 werden veroorzaakt door meerdere factoren, waaronder toegenomen luchtverkeer, weersgerelateerde problemen, menselijke fouten, apparatuurstoringen en veiligheidskwesties zoals kapingen en pogingen tot kaping. De afname van vliegtuigongelukken en sterfgevallen vanaf de jaren 2000 was te danken aan betere vliegtuigontwerpen, veiligheidstechnologieën, opleiding en certificeringsnormen voor piloten, luchtverkeersleidingssystemen, regelgeving en toezicht door luchtvaartautoriteiten, strengere veiligheidsprocedures van luchtvaartmaatschappijen (zoals onderhoudsinspecties, pre-flight checks en bemanningsnseheerpraktijken) en vooruitgang in weersvoorspellingen en communicatietechnologie.(How aviation safety has improved, z.d.)")
+
+
+
+# alaric
+option = st.selectbox(
+    'Select yearly statistic',
+    ('Passengers', 'Flights'))
+
+st.write('You selected:', option)
+
+
+if option == 'Passengers':
+    fig = px.histogram(Air_Traffic,x='Year',y='Passenger Count')
+    st.plotly_chart(fig)
+elif option == 'Flights':
+    fig = px.histogram(Air_Traffic,x='Year')
+    st.plotly_chart(fig)
+
+# assign date
+def period_to_date(var):
+    period = str(var)
+    year = period[0:4]
+    month = period[4:]
+    return f"{year}-{month}"
+
+Air_Traffic['Date'] = pd.to_datetime(Air_Traffic['Activity Period'].apply(period_to_date))
+
+# passenger trends
+passenger_per_year = Air_Traffic.groupby(['Date','GEO Region']).sum()['Passenger Count']
+
+passenger_flights = {
+    'date':[],
+    'region':[],
+    'passengers':[],
+}
+for key in passenger_per_year.keys():
+    passenger_flights['date'].append(key[0])
+    passenger_flights['region'].append(key[1])
+    passenger_flights['passengers'].append(passenger_per_year[key])
+
+
+passenger_flights_df = pd.DataFrame(passenger_flights)
+
+
+fig = px.line(passenger_flights_df,x='date',y='passengers',color='region',markers=True,symbol='region')
+fig.update_traces(marker={'size': 10})
+st.plotly_chart(fig)
