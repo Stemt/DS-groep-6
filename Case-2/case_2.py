@@ -121,7 +121,7 @@ st.subheader("Type vliegtuig")
 # Top 10 aircraft tabel
 top_10_ac = acf_df["Type"].value_counts().iloc[0:10]
 st.write(top_10_ac)
-st.markdown("Er is te zien dat het type Douglas DC-3 de meeste slachtoffers had, in totaal waren dat 4793 personen. Als er gekeken wordt naar de top 4 type vliegtuifen, met de meeste slachtoffers boven 1000 personen, is er te zien dat alle vliegtuigen commerciele en militairen zijn. De vliegtuigen zijn voornamelijk voor militairen operaties gebruikt. Wat opvalt uit de visualisatie is dat er drie verschillende type vliegtuigen, met de meeste fatalities, van dezelfde vliegtuigbouwer zijn; Douglas. Dit zijn absolute waarden dus er is alleen naar de aantal slachtoffers gekeken en niet naar b.v. hoeveel vluchten ieder type vliegtuigen heeft uitgevoerd.")
+st.markdown("Er is te zien dat het type Douglas DC-3 de meeste slachtoffers had, in totaal waren dat 4793 personen. Als er gekeken wordt naar de top 4 type vliegtuigen, met de meeste slachtoffers boven 1000 personen, is er te zien dat alle vliegtuigen commerciele en militairen zijn. De vliegtuigen zijn voornamelijk voor militairen operaties gebruikt. Wat opvalt uit de visualisatie is dat er drie verschillende type vliegtuigen, met de meeste fatalities, van dezelfde vliegtuigbouwer zijn; Douglas. Dit zijn absolute waarden dus er is alleen naar de aantal slachtoffers gekeken en niet naar b.v. hoeveel vluchten ieder type vliegtuigen heeft uitgevoerd.")
 
 fig = px.bar(type_fatalities.query('Fatalities > 1000'),
              y="Fatalities",
@@ -147,7 +147,7 @@ st.subheader("Operators")
 # Top 7 operators met de meeste doden
 import plotly.graph_objs as go
 
-st.markdown("Uit de data is te zien dat de operator Aeroflot de meeste slachtoffers heeft, in totaal zijn er 7156 personen gestorven. Wanneer er naar de gehele visualisatie wordt gekeken is er te zien dat er 5 commerciele operators zijn; Aeroflot, Air France, American Airlines, Pan American World Airways en United Air Lines. Daarnaast zijn er twee militairen operators met de meeste fatalities; U.S. Air Force en U.S. Army Air Forces.")
+st.markdown("Uit de data is te zien dat de operator Aeroflot de meeste slachtoffers heeft, in totaal zijn er 7156 personen overleden. Wanneer er naar de gehele visualisatie wordt gekeken is er te zien dat er 5 commerciele operators zijn; Aeroflot, Air France, American Airlines, Pan American World Airways en United Air Lines. Daarnaast zijn er twee militairen operators met de meeste fatalities; U.S. Air Force en U.S. Army Air Forces.")
 
 operator_data = operator_fatalities.query('Fatalities > 1000')
 
