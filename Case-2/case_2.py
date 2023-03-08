@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import plotly.express as pe
 
+app_dir = os.path.dirname(__file__)
 
 st.title('HI :)')
 
@@ -14,7 +15,7 @@ option = st.selectbox(
 
 st.write('You selected:', option)
 
-Air_Traffic = pd.read_csv("data/Air_Traffic_Passenger_Statistics.csv")
+Air_Traffic = pd.read_csv(f"{app_dir}/data/Air_Traffic_Passenger_Statistics.csv")
 
 if option == 'Passengers':
     fig = pe.histogram(Air_Traffic,x='Year',y='Passenger Count')
