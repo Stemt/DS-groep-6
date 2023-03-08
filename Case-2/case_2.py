@@ -161,8 +161,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-acf_df = pd.read_csv("data/Airplane_Crashes_and_Fatalities_Since_1908.csv")
-acf_df.head()
 
 #Data Cleaning TYPE
 type_fatalities = acf_df.groupby(acf_df['Type'])['Fatalities'].sum().reset_index()
