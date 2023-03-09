@@ -137,6 +137,8 @@ code = '''fig = px.bar(type_fatalities.query('Fatalities > 1000'),
 
 fig.update_layout(yaxis={'categoryorder':'total ascending'})
 
+fig.layout.updatemenus[0].buttons[0].args[1]["frame"]["duration"] = 1000
+
 st.plotly_chart(fig)'''
 st.code(code, language='python')
 
