@@ -66,7 +66,7 @@ st.markdown("De grafiek geeft het totale aantal slachtoffers en passagiers door 
 st.plotly_chart(fig)                 
 
 st.header("Regressie model van de slachtoffers vanaf 1950 tot 2009")
-
+# regressie 
 #Data cleaning REGRESSION
 
 date_fatalities = acf_df.groupby(acf_df['Date'])['Fatalities'].sum().reset_index()
