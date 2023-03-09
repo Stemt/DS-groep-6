@@ -142,7 +142,9 @@ ax.xaxis.set_tick_params(rotation=45)
 ax.set_title("Regressie slachtoffers door de jaren heen")
 ax.set(xlabel="Jaren", ylabel="Slachtoffers")
 
-st.pyplot(fig)
+col1,col2,col3 = st.columns((1,1,1))
+with col1:
+    st.pyplot(fig)
 
 # grafiek met slachtoffers en aantal passagiers 2005-2009
 atps_df.head()
@@ -326,7 +328,9 @@ ax.set_xlabel('Luchtvaartmaatschappij')
 ax.set_ylabel('Passagiers (in miljoenen)')
 ax.set_title('Aantal Passagiers per luchtvaartmaatschappij')
 
-st.pyplot(fig)
+col1,col2,col3 = st.columns((1,1,1))
+with col1:
+    st.pyplot(fig)
 
 
 
