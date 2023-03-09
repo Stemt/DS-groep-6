@@ -95,6 +95,7 @@ fig = px.bar(
     animation_frame='Month',
     title='De luchtvaartmaatschappijen per land'
 )
+fig.update_layout(xaxis_tickangle=-45, width=600, height=600)
 st.plotly_chart(fig)
 JAAR = st.slider('Welke jaar?', 2006, 2016)
 st.write('In', JAAR)
