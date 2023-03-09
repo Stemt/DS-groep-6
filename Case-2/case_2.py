@@ -18,6 +18,7 @@ atps_df = Air_Traffic
 acf_df = pd.read_csv(f"{app_dir}/data/Airplane_Crashes_and_Fatalities_Since_1908.csv")
 print(acf_df.head())
 
+st.title("Analyse van de Relatie tussen Luchtvaart Passagiersstatistieken en Fatale Ongevallen")
 
 # matthijs
 
@@ -108,6 +109,9 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 
 
+
+#Hanna
+
 #Data Cleaning TYPE
 type_fatalities = acf_df.groupby(acf_df['Type'])['Fatalities'].sum().reset_index()
 print(type_fatalities)
@@ -122,6 +126,19 @@ st.subheader("Type vliegtuig")
 top_10_ac = acf_df["Type"].value_counts().iloc[0:10]
 st.write(top_10_ac)
 st.markdown("Er is te zien dat het type Douglas DC-3 de meeste slachtoffers had, in totaal waren dat 4793 personen. Als er gekeken wordt naar de top 4 type vliegtuigen, met de meeste slachtoffers boven 1000 personen, is er te zien dat alle vliegtuigen commerciele en militairen zijn. De vliegtuigen zijn voornamelijk voor militairen operaties gebruikt. Wat opvalt uit de visualisatie is dat er drie verschillende type vliegtuigen, met de meeste fatalities, van dezelfde vliegtuigbouwer zijn; Douglas. Dit zijn absolute waarden dus er is alleen naar de aantal slachtoffers gekeken en niet naar b.v. hoeveel vluchten ieder type vliegtuigen heeft uitgevoerd.")
+
+code = '''fig = px.bar(type_fatalities.query('Fatalities > 1000'),
+             y="Fatalities",
+             x="Type",
+             animation_frame="Type", animation_group="Type",
+             color="Fatalities", 
+             log_y=True,
+             title="Aantal slachtoffers per type vliegtuig (slachtoffers > 1000)", range_y=[1,10000], range_x=[-0.5,3.3], labels={"Fatalities": "Slachtoffers"})
+
+fig.update_layout(yaxis={'categoryorder':'total ascending'})
+
+st.plotly_chart(fig)'''
+st.code(code=code, language='python')
 
 fig = px.bar(type_fatalities.query('Fatalities > 1000'),
              y="Fatalities",
