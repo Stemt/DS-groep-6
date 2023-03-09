@@ -42,7 +42,7 @@ for file in files:
             zip_ref.extractall("data")
             
 
-st.title('Dataset: Air Traffic Passenger Statistics)')
+st.subheader('Dataset: Air Traffic Passenger Statistics')
 st.markdown("De luchtvaart is wereldwijd een van de populairste vormen van vervoer. Miljoenen mensen reizen elke dag met het vliegtuig voor hun werk, vakantie en persoonlijke redenen. De statistieken over vliegtuigpassagiers bieden een waardevol inzicht in trends in het luchtverkeer en helpen belanghebbenden geïnformeerde beslissingen te nemen over de luchtvaartindustrie. De Air Traffic Passenger Statistics dataset bevat maandelijkse gegevens over het aantal passagiers dat wereldwijd via de vliegvelden reizen. De dataset omvat gegevens van meer dan 15000 luchtvaartmaatschappijen van aantal landen.De Air Traffic Passenger Statistics dataset oplevert waardevolle inzichten in het luchtverkeer en de prestaties van de luchtvaartindustrie. De gegevens kunnen worden gebruikt door beleidsmakers, luchthavenautoriteiten en luchtvaartmaatschappijen om met kennis van zaken beslissen over de sector. Het is echter belangrijk op te merken dat de dataset mogelijk niet alle aspecten van het luchtverkeer omvat en dat aanvullende gegevensbronnen nodig kunnen zijn om een volledig inzicht in de sector te krijgen.")
 
 
@@ -93,7 +93,7 @@ fig = px.bar(
     x='Operating Airline',
     y='Passenger Count',
     animation_frame='Month',
-    title='De luchtvaartmaatschappijen per land'
+    title='De aantal passagiers per luchtvaartmaatschappij per jaar/maand'
 )
 fig.update_layout(xaxis_tickangle=-45, width=600, height=600)
 st.plotly_chart(fig)
