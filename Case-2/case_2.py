@@ -7,10 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as pe
 import plotly.express as px
-from sklearn.linear_model import LinearRegression
 from matplotlib.widgets import Slider
-
-
 import kaggle
 import zipfile
 import os
