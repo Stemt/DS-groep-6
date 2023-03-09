@@ -3,13 +3,14 @@ import zipfile
 import os
 import pandas as pd
 import seaborn as sns 
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px 
 from plotly.subplots import make_subplots
 import datetime
 import matplotlib.dates as mdates
 
+st.set_page_config(layout="wide")
 
 app_dir = os.path.dirname(__file__)
 
@@ -19,6 +20,48 @@ acf_df = pd.read_csv(f"{app_dir}/data/Airplane_Crashes_and_Fatalities_Since_1908
 print(acf_df.head())
 
 st.title("Analyse van de Relatie tussen Luchtvaart Passagiersstatistieken en Fatale Ongevallen")
+# API uitleg
+
+st.markdown("## Kaggle API integratie")
+st.markdown("""
+
+Voor het ophalen van de data word gebruik gemaakt van de kaggle API. 
+Naast de kaggle package is het ook nodig om de zipfiles die door de API gedownload worden uit te pakken.
+Hiervoor word gebruikgemaakt van de zipfile en os module van Python zelf.
+De os module word gebruikt om de zipfiles in de 'data' repository te vinden en zipfile om de zipfiles uit te pakken.
+
+```python
+import kaggle
+import zipfile
+import os
+```
+
+Het aanroepen van de API gebeurd als volgt.
+Hier worden onze datasets genaamd 'Airplane Crashes and Fatalities' en 'Air Traffic Passenger Statistics' gedownload en opgeslagen in een folder genaamd 'data'.
+
+```python
+api = kaggle.api
+
+datasets = api.datasets_list(search='Airplane Crashes and Fatalities')
+ref = datasets[0]['ref']
+kaggle.api.dataset_download_files(ref,path='data')
+
+datasets = api.datasets_list(search='Air Traffic Passenger Statistics')
+ref = datasets[0]['ref']
+kaggle.api.dataset_download_files(ref,path='data')
+```
+
+Daarna worden alle aanwezige files in 'data' opgezocht met 'os.listdir("data")' en als het een zipfile is worden de contents daarvan uitgepakt.
+
+```python
+files = os.listdir("data")
+for file in files:
+    if ".zip" in file:
+        with zipfile.ZipFile(f"data/{file}","r") as zip_ref:
+            zip_ref.extractall("data")
+```
+""")
+
 
 # matthijs
 
@@ -66,6 +109,42 @@ st.text("Bronnon: https://www.agcs.allianz.com/news-and-insights/expert-risk-art
 st.markdown("De grafiek geeft het totale aantal slachtoffers en passagiers door de jaren heen weer. De lijnen volgen logischerwijs hetzelfde patroon. Aan de grafiek is te zien dat voornamelijk aan het begin van luchtvaart geen overlevenden waren bij ongelukken. De hoge aantallen vliegtuigongelukken en sterfgevallen in 1970 werden veroorzaakt door meerdere factoren, waaronder toegenomen luchtverkeer, weersgerelateerde problemen, menselijke fouten, apparatuurstoringen en veiligheidskwesties zoals kapingen en pogingen tot kaping. De afname van vliegtuigongelukken en sterfgevallen vanaf de jaren 2000 was te danken aan betere vliegtuigontwerpen, veiligheidstechnologieën, opleiding en certificeringsnormen voor piloten, luchtverkeersleidingssystemen, regelgeving en toezicht door luchtvaartautoriteiten, strengere veiligheidsprocedures van luchtvaartmaatschappijen (zoals onderhoudsinspecties, pre-flight checks en bemanningsnseheerpraktijken) en vooruitgang in weersvoorspellingen en communicatietechnologie.(How aviation safety has improved, z.d.)")
 st.plotly_chart(fig)                 
 
+st.header("Regressie model van de slachtoffers vanaf 1950 tot 2009")
+# regressie 
+#Data cleaning REGRESSION
+
+date_fatalities = acf_df.groupby(acf_df['Date'])['Fatalities'].sum().reset_index()
+date_fatalities['Date'] = pd.to_datetime(date_fatalities['Date'], unit='ns')
+print(date_fatalities)
+
+#Data verkenning REGRESSION + visualisatie 
+
+
+st.subheader("Regressie model")
+
+st.markdown("Uit de visualisatie is er te zien dat er meerdere uitschieters zijn op verschillende jaren. Ook is er te zien dat er vanaf 1970-2008 er een afname is in slachtoffers. Een voorspellende reggresie model zou in dit geval niet betrouwbaar zijn, want de vliegtuigen in de dataset zullen verouderd zijn.")
+
+#Regressie
+
+show_regression = st.checkbox("Toon regressielijn")
+
+subset = date_fatalities[(date_fatalities['Date'] >= datetime.datetime(1950, 1, 1)) & (date_fatalities['Fatalities'] > 150)].copy()
+
+subset.loc[:, 'Date'] = subset['Date'].apply(mdates.date2num)
+
+fig = plt.figure()
+
+ax = sns.regplot(data=subset, x='Date', y='Fatalities', fit_reg=show_regression, dropna=True, marker='*', scatter_kws={"color": "blue"}, line_kws={"color": "red"})
+date_format = mdates.DateFormatter('%m/%d/%Y')
+ax.xaxis.set_major_formatter(date_format)
+ax.xaxis.set_tick_params(rotation=45)
+
+ax.set_title("Regressie slachtoffers door de jaren heen")
+ax.set(xlabel="Jaren", ylabel="Slachtoffers")
+
+col1,col2,col3 = st.columns((1,1,1))
+with col1:
+    st.pyplot(fig)
 
 # grafiek met slachtoffers en aantal passagiers 2005-2009
 atps_df.head()
@@ -122,10 +201,15 @@ print(type_fatalities)
 import plotly.express as px
 
 st.subheader("Type vliegtuig")
-# Top 10 aircraft tabel
+#barplot van top 10 aircraft
 top_10_ac = acf_df["Type"].value_counts().iloc[0:10]
-st.write(top_10_ac)
-st.markdown("Er is te zien dat het type Douglas DC-3 de meeste slachtoffers had, in totaal waren dat 4793 personen. Als er gekeken wordt naar de top 4 type vliegtuigen, met de meeste slachtoffers boven 1000 personen, is er te zien dat alle vliegtuigen commerciele en militairen zijn. De vliegtuigen zijn voornamelijk voor militairen operaties gebruikt. Wat opvalt uit de visualisatie is dat er drie verschillende type vliegtuigen, met de meeste fatalities, van dezelfde vliegtuigbouwer zijn; Douglas. Dit zijn absolute waarden dus er is alleen naar de aantal slachtoffers gekeken en niet naar b.v. hoeveel vluchten ieder type vliegtuigen heeft uitgevoerd.")
+top_10_ac_df = pd.DataFrame(top_10_ac)
+
+bar_top_10 = px.bar(top_10_ac, y = "Type")
+bar_top_10.update_layout(title = "Aantal toestellen betrokken bij ongelukken", xaxis_title = "Toestel", yaxis_title = "Aantal")
+st.markdown("De barplot geeft weer het aantal toestellen weer dat betrokken is bij ongelukken sinds 1908. Te zien is dat voornamelijk toestellen die ook voor militaire doeleinden gebruikt worden vaak betrokken zijn bij ongelukken.")
+st.plotly_chart(bar_top_10)
+st.markdown("Er is te zien dat het type Douglas DC-3 de meeste slachtoffers had, in totaal waren dat 4793 personen. Als er gekeken wordt naar de top 4 type vliegtuifen, met de meeste slachtoffers boven 1000 personen, is er te zien dat alle vliegtuigen commerciele en militairen zijn. De vliegtuigen zijn voornamelijk voor militairen operaties gebruikt. Wat opvalt uit de visualisatie is dat er drie verschillende type vliegtuigen, met de meeste fatalities, van dezelfde vliegtuigbouwer zijn; Douglas. Dit zijn absolute waarden dus er is alleen naar de aantal slachtoffers gekeken en niet naar b.v. hoeveel vluchten ieder type vliegtuigen heeft uitgevoerd.")
 
 code = '''fig = px.bar(type_fatalities.query('Fatalities > 1000'),
              y="Fatalities",
@@ -220,59 +304,69 @@ fig = go.Figure(data=data, layout=layout)
 
 st.plotly_chart(fig)
 
-#REGRESSIE data cleaning
-st.header("Regressie model van de slachtoffers vanaf 1950 tot 2009")
 
-date_fatalities = acf_df.groupby(acf_df['Date'])['Fatalities'].sum().reset_index()
-date_fatalities['Date'] = pd.to_datetime(date_fatalities['Date'], unit='ns')
-print(date_fatalities)
 
-#Data verkenning REGRESSION + visualisatie 
 
-#Hier nog een checkbox toevoegen, zodat het de regressielijn weergeeft met een 'Ja' of 'Nee' 
+#Sara
 
-st.subheader("Regressie model")
 
-st.markdown("Uit de visualisatie is er te zien dat er meerdere uitschieters zijn op verschillende jaren. Ook is er te zien dat er vanaf 1970-2008 er een afname is in slachtoffers. Een voorspellende reggresie model zou in dit geval niet betrouwbaar zijn, want de vliegtuigen in de dataset zullen verouderd zijn.")
+st.subheader('Dataset: Air Traffic Passenger Statistics')
+st.markdown("De luchtvaart is wereldwijd een van de populairste vormen van vervoer. Miljoenen mensen reizen elke dag met het vliegtuig voor hun werk, vakantie en persoonlijke redenen. De statistieken over vliegtuigpassagiers bieden een waardevol inzicht in trends in het luchtverkeer en helpen belanghebbenden geïnformeerde beslissingen te nemen over de luchtvaartindustrie. De Air Traffic Passenger Statistics dataset bevat maandelijkse gegevens over het aantal passagiers dat wereldwijd via de vliegvelden reizen. De dataset omvat gegevens van meer dan 15000 luchtvaartmaatschappijen van aantal landen.De Air Traffic Passenger Statistics dataset oplevert waardevolle inzichten in het luchtverkeer en de prestaties van de luchtvaartindustrie. De gegevens kunnen worden gebruikt door beleidsmakers, luchthavenautoriteiten en luchtvaartmaatschappijen om met kennis van zaken beslissen over de sector. Het is echter belangrijk op te merken dat de dataset mogelijk niet alle aspecten van het luchtverkeer omvat en dat aanvullende gegevensbronnen nodig kunnen zijn om een volledig inzicht in de sector te krijgen.")
 
-#Regressie
 
-show_regression = st.checkbox("Toon regressielijn")
+st.subheader('Een overzicht over aantal passengers per top luchtvaartmaatschappij')
+st.markdown("In deze visualisatie wordt de passagiers per aantal luchtvaartmaatschappij getoond. Op basis van deze visualisatie wordt duidelijk dat de aantal passagiers per luchtvaartmaatschappijen enorm verschillen van elkaar. United Airline Pre heeft bijvoorbeeld de meeste passagiers in vergelijking met andere luchtvaartmaatschappijen.")
 
-subset = date_fatalities[(date_fatalities['Date'] >= datetime.datetime(1950, 1, 1)) & (date_fatalities['Fatalities'] > 150)].copy()
 
-subset.loc[:, 'Date'] = subset['Date'].apply(mdates.date2num)
+busiest_airports = Air_Traffic.groupby('Operating Airline').sum()['Passenger Count'].sort_values(ascending=False)[:10]
+fig,ax = plt.subplots()
+ax.bar(busiest_airports.index, busiest_airports.values)
+ax.set_xticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+ax.set_xticklabels(['United Airelines Pre', 'United Airelines', 'SkyWest Aireline', 'American Airelines', 'Virgin America', 'Delta Aire lines', 'Southwest Airelines', 'US Airelines', 'Alaska Aireline', 'JetBlue Aireways'], rotation=45, ha='right')
+ax.set_xlabel('Luchtvaartmaatschappij')
+ax.set_ylabel('Passagiers (in miljoenen)')
+ax.set_title('Aantal Passagiers per luchtvaartmaatschappij')
 
-fig = plt.figure()
+col1,col2,col3 = st.columns((1,1,1))
+with col1:
+    st.pyplot(fig)
 
-ax = sns.regplot(data=subset, x='Date', y='Fatalities', fit_reg=show_regression, dropna=True, marker='*', scatter_kws={"color": "blue"}, line_kws={"color": "red"})
-date_format = mdates.DateFormatter('%m/%d/%Y')
-ax.xaxis.set_major_formatter(date_format)
-ax.xaxis.set_tick_params(rotation=45)
 
-ax.set_title("Regressie slachtoffers door de jaren heen")
-ax.set(xlabel="Jaren", ylabel="Slachtoffers")
 
-st.pyplot(fig)
+# Variabelen die ik nodig heb
+JAAR = Air_Traffic['Year']
+PASSENGER= Air_Traffic['Passenger Count']
+LANDEN = Air_Traffic['GEO Region']
+SOORT_VLIEGTUIG = Air_Traffic['GEO Summary']
 
-st.header("Totaal aantal slachtoffers per jaar")
+st.subheader("Een overzicht over de luchtvaartmaatschappijen per land")
+st.markdown("Met behulp van deze visualisatie laat de aantal passagiers per luchtvaartmaatschaappij zien. Op basis van jaartal wortd er een slider toegevoegd, daarnaast is er nog een dropdown beschikbaar gesteld zodat alleen de relevante data kunnen gekozen worden.")
 
+
+LANDEN = st.selectbox(
+    'Landen',
+    ('US', 'Central America', 'Canada', 'Asia', 'Europe', 'Mexico', 'Australia / OceaniaAustralia'))
+
+st.write('U hebt gekozen voor', LANDEN, 'gekozen')
+
+
+
+Air_Traffic_filtered = Air_Traffic[(Air_Traffic['GEO Region'] == LANDEN) & (Air_Traffic['Year'] == JAAR)]
+
+fig = px.bar(
+    data_frame=Air_Traffic_filtered,
+    x='Operating Airline',
+    y='Passenger Count',
+    animation_frame='Month',
+    title='De aantal passagiers per luchtvaartmaatschappij per jaar/maand'
+)
+fig.update_layout(xaxis_tickangle=-45, width=600, height=600)
+st.plotly_chart(fig)
+JAAR = st.slider('Welke jaar?', 2006, 2016)
+st.write('In', JAAR)
 
 
 # alaric
-option = st.selectbox(
-    'Select yearly statistic',
-    ('Passengers', 'Flights'))
-
-st.write('You selected:', option)
-
-
-if option == 'Passengers':
-    fig = px.histogram(Air_Traffic,x='Year',y='Passenger Count')
-    st.plotly_chart(fig)
-elif option == 'Flights':
-    fig = px.histogram(Air_Traffic,x='Year')
-    st.plotly_chart(fig)
 
 # assign date
 def period_to_date(var):
@@ -284,22 +378,115 @@ def period_to_date(var):
 Air_Traffic['Date'] = pd.to_datetime(Air_Traffic['Activity Period'].apply(period_to_date))
 
 # passenger trends
-passenger_per_year = Air_Traffic.groupby(['Date','GEO Region']).sum()['Passenger Count']
+st.title("Passenger Trends tussen Juli 2005 en Maart 2016")
 
+st.markdown("""
+De grafieken links laten de ontwikkeling van passagiers voor verschillende regios in de priode Juli 2005 - Maart 2016 zien.
+De histogram rechts laat de ontwikkeling van het passagiers totaal over meerder jaren zien.
+
+Met de checkboxes rechtsonderin kunnen regios geselecteerd worden om in de grafieken links te laten zien of te verbergen.
+
+Uit deze data blijkt dat verreweg de meeste passagiers binnen de 'US" regio vliegen. Deze aantallen vergeleken met de aantallen van andere regio's laten ons twijfelen
+of deze data over de hele wereld gaat of alleen van vliegverker dat begint of eindigt in de VS. 
+Verder vertelt deze dataset ons ook dat passagiers aantallen binnen de VS ook nog het snelste groeien van alle regio's inclusief Azië wat onze twijfel over de dataset zelf ook alleen maar vergroot.
+
+Verder is nog te zien dat vliegverker erg seizoensgebonden is en dus in de zomer meestal piekt en in de winter het laagst is.
+""")
+
+col1, col2 = st.columns((1,1))
+passenger_per_date = Air_Traffic.groupby(['Date','GEO Region']).sum()['Passenger Count']
+
+region_checkboxes = {}
+with col2:
+    st.markdown("## Ontwikkeling van het passagiers totaal per jaar")
+    fig = px.histogram(Air_Traffic,x='Year',y='Passenger Count')
+    fig.update_layout(bargap=0.2)
+    st.plotly_chart(fig)
+    st.text("Regio selectie:")
+    for region in Air_Traffic['GEO Region'].unique():
+        region_checkboxes[region] = st.checkbox(region,value=True)
+    
+
+with col1:
+    st.markdown("## Ontwikkeling per land per maand")
+    passenger_flights = {
+        'Date':[],
+        'region':[],
+        'Passengers':[],
+    }
+    for key in passenger_per_date.keys():
+        if region_checkboxes[key[1]]:
+            passenger_flights['Date'].append(key[0])
+            passenger_flights['region'].append(key[1])
+            passenger_flights['Passengers'].append(passenger_per_date[key])
+
+    passenger_flights_df = pd.DataFrame(passenger_flights)
+
+
+    passenger_flights_df = passenger_flights_df.sort_values(['region','Date'])
+
+    fig = px.line(passenger_flights_df,x='Date',y='Passengers',color='region',markers=True,symbol='region')
+    fig.update_traces(marker={'size': 10})
+    st.plotly_chart(fig)
+
+    passenger_deltas_df = passenger_flights_df.sort_values(['region','Date'])
+
+    passenger_deltas_df['Monthly Difference in Passengers'] = passenger_deltas_df['Passengers'].diff()
+    for region in passenger_deltas_df['region'].unique():
+        if region_checkboxes[region]:
+            start_index = passenger_deltas_df[passenger_flights_df.region == region].first_valid_index()
+            passenger_deltas_df.at[start_index,'Monthly Difference in Passengers'] = 0
+
+    print(passenger_deltas_df.head())
+
+    fig = px.line(passenger_deltas_df,x='Date',y='Monthly Difference in Passengers',color='region',markers=True,symbol='region')
+    fig.update_traces(marker={'size': 10})
+
+    st.plotly_chart(fig)
+
+
+
+st.markdown("""
+## Code maandelijkse verandering in passagiers aantal per regio
+
+Eerst moet er een groupby sum gebeuren om de aantallen passagiers per maand per regio te verkrijgen
+
+```python
+passenger_per_date = Air_Traffic.groupby(['Date','GEO Region']).sum()['Passenger Count']
+```
+
+Daarna word hiervan een nieuwe dataframe gemaakt waar ook gelijk gefilterd word op de geselecteerde regios van de checkboxes.
+```python
 passenger_flights = {
-    'date':[],
+    'Date':[],
     'region':[],
-    'passengers':[],
+    'Passengers':[],
 }
-for key in passenger_per_year.keys():
-    passenger_flights['date'].append(key[0])
-    passenger_flights['region'].append(key[1])
-    passenger_flights['passengers'].append(passenger_per_year[key])
-
+for key in passenger_per_date.keys():
+    if region_checkboxes[key[1]]: # voeg data alleen toe als de bijbehorende regio is geselecteerd
+        passenger_flights['Date'].append(key[0])
+        passenger_flights['region'].append(key[1])
+        passenger_flights['Passengers'].append(passenger_per_date[key])
 
 passenger_flights_df = pd.DataFrame(passenger_flights)
+```
+
+Om de verschillen per regio per maand te berekenen word de dataframe gesorteerd op regio en maand waarna de `diff()` function hierop uitgevoerd word
+om de verschillen per maand te berekenen.
+```python
+passenger_deltas_df = passenger_flights_df.sort_values(['region','Date'])
+passenger_deltas_df['Monthly Difference in Passengers'] = passenger_deltas_df['Passengers'].diff()
+
+```
+
+Het nadeel van deze methode is dat op de plaats waar een nieuwe regio start het verschil nog word berekent van de vorige regio.
+Om dit verhelpen word het eerste verschil van iedere regio gelijk gezet aan 0 met behulp van een for loop en de `first_valid_index()` functie.
+```python
+for region in passenger_deltas_df['region'].unique():
+    if region_checkboxes[region]:
+        start_index = passenger_deltas_df[passenger_flights_df.region == region].first_valid_index()
+        passenger_deltas_df.at[start_index,'Monthly Difference in Passengers'] = 0
+```
+""")
 
 
-fig = px.line(passenger_flights_df,x='date',y='passengers',color='region',markers=True,symbol='region')
-fig.update_traces(marker={'size': 10})
-st.plotly_chart(fig)
