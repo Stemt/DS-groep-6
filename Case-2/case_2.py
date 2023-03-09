@@ -124,7 +124,7 @@ top_10_ac_df = pd.DataFrame(top_10_ac)
 
 bar_top_10 = px.bar(top_10_ac, y = "Type")
 bar_top_10.update_layout(title = "Aantal toestellen betrokken bij ongelukken", xaxis_title = "Toestel", yaxis_title = "Aantal")
-st.markdown("De barplot geeft weer het aantal toestellen weer dat betrokken is bij ongelukken sinds 1908. Te zien is dat voornamelijk toestellen die ook voor militaire doeleinden gebruikt worden vaak betrokken zijn bij ongelukken")
+st.markdown("De barplot geeft weer het aantal toestellen weer dat betrokken is bij ongelukken sinds 1908. Te zien is dat voornamelijk toestellen die ook voor militaire doeleinden gebruikt worden vaak betrokken zijn bij ongelukken.")
 st.plotly_chart(bar_top_10)
 st.markdown("Er is te zien dat het type Douglas DC-3 de meeste slachtoffers had, in totaal waren dat 4793 personen. Als er gekeken wordt naar de top 4 type vliegtuifen, met de meeste slachtoffers boven 1000 personen, is er te zien dat alle vliegtuigen commerciele en militairen zijn. De vliegtuigen zijn voornamelijk voor militairen operaties gebruikt. Wat opvalt uit de visualisatie is dat er drie verschillende type vliegtuigen, met de meeste fatalities, van dezelfde vliegtuigbouwer zijn; Douglas. Dit zijn absolute waarden dus er is alleen naar de aantal slachtoffers gekeken en niet naar b.v. hoeveel vluchten ieder type vliegtuigen heeft uitgevoerd.")
 
