@@ -10,6 +10,7 @@ from plotly.subplots import make_subplots
 import datetime
 import matplotlib.dates as mdates
 
+st.set_page_config(layout="wide")
 
 app_dir = os.path.dirname(__file__)
 
@@ -19,6 +20,48 @@ acf_df = pd.read_csv(f"{app_dir}/data/Airplane_Crashes_and_Fatalities_Since_1908
 print(acf_df.head())
 
 st.title("Analyse van de Relatie tussen Luchtvaart Passagiersstatistieken en Fatale Ongevallen")
+# API uitleg
+
+st.markdown("## Kaggle API integratie")
+st.markdown("""
+
+Voor het ophalen van de data word gebruik gemaakt van de kaggle API. 
+Naast de kaggle package is het ook nodig om de zipfiles die door de API gedownload worden uit te pakken.
+Hiervoor word gebruikgemaakt van de zipfile en os module van Python zelf.
+De os module word gebruikt om de zipfiles in de 'data' repository te vinden en zipfile om de zipfiles uit te pakken.
+
+```python
+import kaggle
+import zipfile
+import os
+```
+
+Het aanroepen van de API gebeurd als volgt.
+Hier worden onze datasets genaamd 'Airplane Crashes and Fatalities' en 'Air Traffic Passenger Statistics' gedownload en opgeslagen in een folder genaamd 'data'.
+
+```python
+api = kaggle.api
+
+datasets = api.datasets_list(search='Airplane Crashes and Fatalities')
+ref = datasets[0]['ref']
+kaggle.api.dataset_download_files(ref,path='data')
+
+datasets = api.datasets_list(search='Air Traffic Passenger Statistics')
+ref = datasets[0]['ref']
+kaggle.api.dataset_download_files(ref,path='data')
+```
+
+Daarna worden alle aanwezige files in 'data' opgezocht met 'os.listdir("data")' en als het een zipfile is worden de contents daarvan uitgepakt.
+
+```python
+files = os.listdir("data")
+for file in files:
+    if ".zip" in file:
+        with zipfile.ZipFile(f"data/{file}","r") as zip_ref:
+            zip_ref.extractall("data")
+```
+""")
+
 
 # matthijs
 
@@ -260,50 +303,6 @@ fig = go.Figure(data=data, layout=layout)
 st.plotly_chart(fig)
 
 
-# alaric
-option = st.selectbox(
-    'Select yearly statistic',
-    ('Passengers', 'Flights'))
-
-st.write('You selected:', option)
-
-
-if option == 'Passengers':
-    fig = px.histogram(Air_Traffic,x='Year',y='Passenger Count')
-    st.plotly_chart(fig)
-elif option == 'Flights':
-    fig = px.histogram(Air_Traffic,x='Year')
-    st.plotly_chart(fig)
-
-# assign date
-def period_to_date(var):
-    period = str(var)
-    year = period[0:4]
-    month = period[4:]
-    return f"{year}-{month}"
-
-Air_Traffic['Date'] = pd.to_datetime(Air_Traffic['Activity Period'].apply(period_to_date))
-
-# passenger trends
-passenger_per_year = Air_Traffic.groupby(['Date','GEO Region']).sum()['Passenger Count']
-
-passenger_flights = {
-    'date':[],
-    'region':[],
-    'passengers':[],
-}
-for key in passenger_per_year.keys():
-    passenger_flights['date'].append(key[0])
-    passenger_flights['region'].append(key[1])
-    passenger_flights['passengers'].append(passenger_per_year[key])
-
-
-passenger_flights_df = pd.DataFrame(passenger_flights)
-
-
-fig = px.line(passenger_flights_df,x='date',y='passengers',color='region',markers=True,symbol='region')
-fig.update_traces(marker={'size': 10})
-st.plotly_chart(fig)
 
 
 #Sara
@@ -363,5 +362,128 @@ st.plotly_chart(fig)
 JAAR = st.slider('Welke jaar?', 2006, 2016)
 st.write('In', JAAR)
 
+
+# alaric
+
+# assign date
+def period_to_date(var):
+    period = str(var)
+    year = period[0:4]
+    month = period[4:]
+    return f"{year}-{month}"
+
+Air_Traffic['Date'] = pd.to_datetime(Air_Traffic['Activity Period'].apply(period_to_date))
+
+# passenger trends
+st.title("Passenger Trends tussen Juli 2005 en Maart 2016")
+
+st.markdown("""
+De grafieken links laten de ontwikkeling van passagiers voor verschillende regios in de priode Juli 2005 - Maart 2016 zien.
+De histogram rechts laat de ontwikkeling van het passagiers totaal over meerder jaren zien.
+
+Met de checkboxes rechtsonderin kunnen regios geselecteerd worden om in de grafieken links te laten zien of te verbergen.
+
+Uit deze data blijkt dat verreweg de meeste passagiers binnen de 'US" regio vliegen. Deze aantallen vergeleken met de aantallen van andere regio's laten ons twijfelen
+of deze data over de hele wereld gaat of alleen van vliegverker dat begint of eindigt in de VS. 
+Verder vertelt deze dataset ons ook dat passagiers aantallen binnen de VS ook nog het snelste groeien van alle regio's inclusief Azië wat onze twijfel over de dataset zelf ook alleen maar vergroot.
+
+Verder is nog te zien dat vliegverker erg seizoensgebonden is en dus in de zomer meestal piekt en in de winter het laagst is.
+""")
+
+col1, col2 = st.columns((1,1))
+passenger_per_date = Air_Traffic.groupby(['Date','GEO Region']).sum()['Passenger Count']
+
+region_checkboxes = {}
+with col2:
+    st.markdown("## Ontwikkeling van het passagiers totaal per jaar")
+    fig = px.histogram(Air_Traffic,x='Year',y='Passenger Count')
+    fig.update_layout(bargap=0.2)
+    st.plotly_chart(fig)
+    st.text("Regio selectie:")
+    for region in Air_Traffic['GEO Region'].unique():
+        region_checkboxes[region] = st.checkbox(region,value=True)
+    
+
+with col1:
+    st.markdown("## Ontwikkeling per land per maand")
+    passenger_flights = {
+        'Date':[],
+        'region':[],
+        'Passengers':[],
+    }
+    for key in passenger_per_date.keys():
+        if region_checkboxes[key[1]]:
+            passenger_flights['Date'].append(key[0])
+            passenger_flights['region'].append(key[1])
+            passenger_flights['Passengers'].append(passenger_per_date[key])
+
+    passenger_flights_df = pd.DataFrame(passenger_flights)
+
+
+    passenger_flights_df = passenger_flights_df.sort_values(['region','Date'])
+
+    fig = px.line(passenger_flights_df,x='Date',y='Passengers',color='region',markers=True,symbol='region')
+    fig.update_traces(marker={'size': 10})
+    st.plotly_chart(fig)
+
+    passenger_deltas_df = passenger_flights_df.sort_values(['region','Date'])
+
+    passenger_deltas_df['Monthly Difference in Passengers'] = passenger_deltas_df['Passengers'].diff()
+    for region in passenger_deltas_df['region'].unique():
+        if region_checkboxes[region]:
+            start_index = passenger_deltas_df[passenger_flights_df.region == region].first_valid_index()
+            passenger_deltas_df.at[start_index,'Monthly Difference in Passengers'] = 0
+
+    print(passenger_deltas_df.head())
+
+    fig = px.line(passenger_deltas_df,x='Date',y='Monthly Difference in Passengers',color='region',markers=True,symbol='region')
+    fig.update_traces(marker={'size': 10})
+
+    st.plotly_chart(fig)
+
+
+
+st.markdown("""
+## Code maandelijkse verandering in passagiers aantal per regio
+
+Eerst moet er een groupby sum gebeuren om de aantallen passagiers per maand per regio te verkrijgen
+
+```python
+passenger_per_date = Air_Traffic.groupby(['Date','GEO Region']).sum()['Passenger Count']
+```
+
+Daarna word hiervan een nieuwe dataframe gemaakt waar ook gelijk gefilterd word op de geselecteerde regios van de checkboxes.
+```python
+passenger_flights = {
+    'Date':[],
+    'region':[],
+    'Passengers':[],
+}
+for key in passenger_per_date.keys():
+    if region_checkboxes[key[1]]: # voeg data alleen toe als de bijbehorende regio is geselecteerd
+        passenger_flights['Date'].append(key[0])
+        passenger_flights['region'].append(key[1])
+        passenger_flights['Passengers'].append(passenger_per_date[key])
+
+passenger_flights_df = pd.DataFrame(passenger_flights)
+```
+
+Om de verschillen per regio per maand te berekenen word de dataframe gesorteerd op regio en maand waarna de `diff()` function hierop uitgevoerd word
+om de verschillen per maand te berekenen.
+```python
+passenger_deltas_df = passenger_flights_df.sort_values(['region','Date'])
+passenger_deltas_df['Monthly Difference in Passengers'] = passenger_deltas_df['Passengers'].diff()
+
+```
+
+Het nadeel van deze methode is dat op de plaats waar een nieuwe regio start het verschil nog word berekent van de vorige regio.
+Om dit verhelpen word het eerste verschil van iedere regio gelijk gezet aan 0 met behulp van een for loop en de `first_valid_index()` functie.
+```python
+for region in passenger_deltas_df['region'].unique():
+    if region_checkboxes[region]:
+        start_index = passenger_deltas_df[passenger_flights_df.region == region].first_valid_index()
+        passenger_deltas_df.at[start_index,'Monthly Difference in Passengers'] = 0
+```
+""")
 
 
