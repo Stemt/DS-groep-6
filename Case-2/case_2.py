@@ -145,10 +145,12 @@ fig = px.bar(type_fatalities.query('Fatalities > 1000'),
              x="Type",
              animation_frame="Type", animation_group="Type",
              color="Fatalities", 
-             log_y=True,
+             log_y=True,  
              title="Aantal slachtoffers per type vliegtuig (slachtoffers > 1000)", range_y=[1,10000], range_x=[-0.5,3.3], labels={"Fatalities": "Slachtoffers"})
 
 fig.update_layout(yaxis={'categoryorder':'total ascending'})
+
+fig.layout.updatemenus[0].buttons[0].args[1]["frame"]["duration"] = 1000
 
 st.plotly_chart(fig)
 
@@ -162,7 +164,7 @@ st.subheader("Operators")
 
 # Nu kijken we naar de meeste doden per operator
 # Top 7 operators met de meeste doden
-import plotly.graph_objs as go
+import plotly.graph_objects as go
 
 st.markdown("Uit de data is te zien dat de operator Aeroflot de meeste slachtoffers heeft, in totaal zijn er 7156 personen overleden. Wanneer er naar de gehele visualisatie wordt gekeken is er te zien dat er 5 commerciele operators zijn; Aeroflot, Air France, American Airlines, Pan American World Airways en United Air Lines. Daarnaast zijn er twee militairen operators met de meeste fatalities; U.S. Air Force en U.S. Army Air Forces.")
 
@@ -183,11 +185,11 @@ for i, operator in enumerate(operator_data['Operator'].unique()):
     data.append(trace)
 
 buttons = []
-for operator in operator_data['Operator'].unique():
+for operator in ['Alle operators'] + list(operator_data['Operator'].unique()):
     button = dict(
         label=operator,
         method="update",
-        args=[{"visible": [operator == trace.name for trace in data]}, {'title': operator}]
+        args=[{"visible": [True] * (len(data) + 1) if operator == 'Alle operators' else [operator == trace.name for trace in data]}, {'title': operator}]
     )
     buttons.append(button)
 
@@ -216,9 +218,8 @@ fig = go.Figure(data=data, layout=layout)
 
 st.plotly_chart(fig)
 
+#REGRESSIE data cleaning
 st.header("Regressie model van de slachtoffers vanaf 1950 tot 2009")
-
-#Data cleaning REGRESSION
 
 date_fatalities = acf_df.groupby(acf_df['Date'])['Fatalities'].sum().reset_index()
 date_fatalities['Date'] = pd.to_datetime(date_fatalities['Date'], unit='ns')
@@ -227,7 +228,6 @@ print(date_fatalities)
 #Data verkenning REGRESSION + visualisatie 
 
 #Hier nog een checkbox toevoegen, zodat het de regressielijn weergeeft met een 'Ja' of 'Nee' 
-
 
 st.subheader("Regressie model")
 
