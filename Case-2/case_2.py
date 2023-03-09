@@ -61,7 +61,7 @@ ax.bar(busiest_airports.index, busiest_airports.values)
 ax.set_xticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 ax.set_xticklabels(['United Airelines Pre', 'United Airelines', 'SkyWest Aireline', 'American Airelines', 'Virgin America', 'Delta Aire lines', 'Southwest Airelines', 'US Airelines', 'Alaska Aireline', 'JetBlue Aireways'], rotation=45, ha='right')
 ax.set_xlabel('Luchtvaartmaatschappij')
-ax.set_ylabel('Passagiers')
+ax.set_ylabel('Passagiers (in miljoenen)')
 ax.set_title('Aantal Passagiers per luchtvaartmaatschappij')
 
 st.pyplot(fig)
