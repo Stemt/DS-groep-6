@@ -138,7 +138,7 @@ code = '''fig = px.bar(type_fatalities.query('Fatalities > 1000'),
 fig.update_layout(yaxis={'categoryorder':'total ascending'})
 
 st.plotly_chart(fig)'''
-st.code(code=code, language='python')
+st.code(code, language='python')
 
 fig = px.bar(type_fatalities.query('Fatalities > 1000'),
              y="Fatalities",
