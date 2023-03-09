@@ -3,7 +3,7 @@ import zipfile
 import os
 import pandas as pd
 import seaborn as sns 
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px 
 from plotly.subplots import make_subplots
@@ -65,6 +65,40 @@ st.text("Bronnon: https://www.agcs.allianz.com/news-and-insights/expert-risk-art
 st.markdown("De grafiek geeft het totale aantal slachtoffers en passagiers door de jaren heen weer. De lijnen volgen logischerwijs hetzelfde patroon. Aan de grafiek is te zien dat voornamelijk aan het begin van luchtvaart geen overlevenden waren bij ongelukken. De hoge aantallen vliegtuigongelukken en sterfgevallen in 1970 werden veroorzaakt door meerdere factoren, waaronder toegenomen luchtverkeer, weersgerelateerde problemen, menselijke fouten, apparatuurstoringen en veiligheidskwesties zoals kapingen en pogingen tot kaping. De afname van vliegtuigongelukken en sterfgevallen vanaf de jaren 2000 was te danken aan betere vliegtuigontwerpen, veiligheidstechnologieën, opleiding en certificeringsnormen voor piloten, luchtverkeersleidingssystemen, regelgeving en toezicht door luchtvaartautoriteiten, strengere veiligheidsprocedures van luchtvaartmaatschappijen (zoals onderhoudsinspecties, pre-flight checks en bemanningsnseheerpraktijken) en vooruitgang in weersvoorspellingen en communicatietechnologie.(How aviation safety has improved, z.d.)")
 st.plotly_chart(fig)                 
 
+st.header("Regressie model van de slachtoffers vanaf 1950 tot 2009")
+
+#Data cleaning REGRESSION
+
+date_fatalities = acf_df.groupby(acf_df['Date'])['Fatalities'].sum().reset_index()
+date_fatalities['Date'] = pd.to_datetime(date_fatalities['Date'], unit='ns')
+print(date_fatalities)
+
+#Data verkenning REGRESSION + visualisatie 
+
+
+st.subheader("Regressie model")
+
+st.markdown("Uit de visualisatie is er te zien dat er meerdere uitschieters zijn op verschillende jaren. Ook is er te zien dat er vanaf 1970-2008 er een afname is in slachtoffers. Een voorspellende reggresie model zou in dit geval niet betrouwbaar zijn, want de vliegtuigen in de dataset zullen verouderd zijn.")
+
+#Regressie
+
+show_regression = st.checkbox("Toon regressielijn")
+
+subset = date_fatalities[(date_fatalities['Date'] >= datetime.datetime(1950, 1, 1)) & (date_fatalities['Fatalities'] > 150)].copy()
+
+subset.loc[:, 'Date'] = subset['Date'].apply(mdates.date2num)
+
+fig = plt.figure()
+
+ax = sns.regplot(data=subset, x='Date', y='Fatalities', fit_reg=show_regression, dropna=True, marker='*', scatter_kws={"color": "blue"}, line_kws={"color": "red"})
+date_format = mdates.DateFormatter('%m/%d/%Y')
+ax.xaxis.set_major_formatter(date_format)
+ax.xaxis.set_tick_params(rotation=45)
+
+ax.set_title("Regressie slachtoffers door de jaren heen")
+ax.set(xlabel="Jaren", ylabel="Slachtoffers")
+
+st.pyplot(fig)
 
 # grafiek met slachtoffers en aantal passagiers 2005-2009
 atps_df.head()
@@ -203,47 +237,6 @@ layout = go.Layout(
 fig = go.Figure(data=data, layout=layout)
 
 st.plotly_chart(fig)
-
-st.header("Regressie model van de slachtoffers vanaf 1950 tot 2009")
-
-#Data cleaning REGRESSION
-
-date_fatalities = acf_df.groupby(acf_df['Date'])['Fatalities'].sum().reset_index()
-date_fatalities['Date'] = pd.to_datetime(date_fatalities['Date'], unit='ns')
-print(date_fatalities)
-
-#Data verkenning REGRESSION + visualisatie 
-
-#Hier nog een checkbox toevoegen, zodat het de regressielijn weergeeft met een 'Ja' of 'Nee' 
-
-
-st.subheader("Regressie model")
-
-st.markdown("Uit de visualisatie is er te zien dat er meerdere uitschieters zijn op verschillende jaren. Ook is er te zien dat er vanaf 1970-2008 er een afname is in slachtoffers. Een voorspellende reggresie model zou in dit geval niet betrouwbaar zijn, want de vliegtuigen in de dataset zullen verouderd zijn.")
-
-#Regressie
-
-show_regression = st.checkbox("Toon regressielijn")
-
-subset = date_fatalities[(date_fatalities['Date'] >= datetime.datetime(1950, 1, 1)) & (date_fatalities['Fatalities'] > 150)].copy()
-
-subset.loc[:, 'Date'] = subset['Date'].apply(mdates.date2num)
-
-fig = plt.figure()
-
-ax = sns.regplot(data=subset, x='Date', y='Fatalities', fit_reg=show_regression, dropna=True, marker='*', scatter_kws={"color": "blue"}, line_kws={"color": "red"})
-date_format = mdates.DateFormatter('%m/%d/%Y')
-ax.xaxis.set_major_formatter(date_format)
-ax.xaxis.set_tick_params(rotation=45)
-
-ax.set_title("Regressie slachtoffers door de jaren heen")
-ax.set(xlabel="Jaren", ylabel="Slachtoffers")
-
-st.pyplot(fig)
-
-st.header("Totaal aantal slachtoffers per jaar")
-
-
 
 # alaric
 option = st.selectbox(
