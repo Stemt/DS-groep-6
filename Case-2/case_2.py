@@ -316,7 +316,6 @@ st.markdown("De luchtvaart is wereldwijd een van de populairste vormen van vervo
 
 st.subheader('Een overzicht over aantal passengers per top luchtvaartmaatschappij')
 st.markdown("In deze visualisatie wordt de passagiers per aantal luchtvaartmaatschappij getoond. Op basis van deze visualisatie wordt duidelijk dat de aantal passagiers per luchtvaartmaatschappijen enorm verschillen van elkaar. United Airline Pre heeft bijvoorbeeld de meeste passagiers in vergelijking met andere luchtvaartmaatschappijen.")
-Air_Traffic = pd.read_csv('data/Air_Traffic_Passenger_Statistics.csv')
 
 
 busiest_airports = Air_Traffic.groupby('Operating Airline').sum()['Passenger Count'].sort_values(ascending=False)[:10]
