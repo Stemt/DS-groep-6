@@ -1,3 +1,6 @@
+# streamlit link: https://stemt-ds-groep-6-case-2case-2-3ys59i.streamlit.app/
+# github link: https://github.com/Stemt/DS-groep-6/tree/master/Case-2
+
 import streamlit as st
 import zipfile
 import os
@@ -310,7 +313,7 @@ st.plotly_chart(fig)
 #Sara
 
 
-st.subheader('Dataset: Air Traffic Passenger Statistics')
+st.subheader('Luchtvaart Passagiersstatistieken')
 st.markdown("De luchtvaart is wereldwijd een van de populairste vormen van vervoer. Miljoenen mensen reizen elke dag met het vliegtuig voor hun werk, vakantie en persoonlijke redenen. De statistieken over vliegtuigpassagiers bieden een waardevol inzicht in trends in het luchtverkeer en helpen belanghebbenden geïnformeerde beslissingen te nemen over de luchtvaartindustrie. De Air Traffic Passenger Statistics dataset bevat maandelijkse gegevens over het aantal passagiers dat wereldwijd via de vliegvelden reizen. De dataset omvat gegevens van meer dan 15000 luchtvaartmaatschappijen van aantal landen.De Air Traffic Passenger Statistics dataset oplevert waardevolle inzichten in het luchtverkeer en de prestaties van de luchtvaartindustrie. De gegevens kunnen worden gebruikt door beleidsmakers, luchthavenautoriteiten en luchtvaartmaatschappijen om met kennis van zaken beslissen over de sector. Het is echter belangrijk op te merken dat de dataset mogelijk niet alle aspecten van het luchtverkeer omvat en dat aanvullende gegevensbronnen nodig kunnen zijn om een volledig inzicht in de sector te krijgen.")
 
 
@@ -377,16 +380,16 @@ def period_to_date(var):
 
 Air_Traffic['Date'] = pd.to_datetime(Air_Traffic['Activity Period'].apply(period_to_date))
 
-# passenger trends
-st.title("Passenger Trends tussen Juli 2005 en Maart 2016")
 
 st.markdown("""
+## Passagierstrends tussen Juli 2005 en Maart 2016
+
 De grafieken links laten de ontwikkeling van passagiers voor verschillende regios in de priode Juli 2005 - Maart 2016 zien.
 De histogram rechts laat de ontwikkeling van het passagiers totaal over meerder jaren zien.
 
 Met de checkboxes rechtsonderin kunnen regios geselecteerd worden om in de grafieken links te laten zien of te verbergen.
 
-Uit deze data blijkt dat verreweg de meeste passagiers binnen de 'US" regio vliegen. Deze aantallen vergeleken met de aantallen van andere regio's laten ons twijfelen
+Uit deze data blijkt dat verreweg de meeste passagiers binnen de VS vliegen. Deze aantallen vergeleken met de aantallen van andere regio's laten ons twijfelen
 of deze data over de hele wereld gaat of alleen van vliegverker dat begint of eindigt in de VS. 
 Verder vertelt deze dataset ons ook dat passagiers aantallen binnen de VS ook nog het snelste groeien van alle regio's inclusief Azië wat onze twijfel over de dataset zelf ook alleen maar vergroot.
 
