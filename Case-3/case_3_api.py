@@ -27,16 +27,16 @@ def get_OCM_df(limit):
     return Laadpalen
 
 # https://opendata.rdw.nl/Voertuigen/Open-Data-RDW-Gekentekende_voertuigen/m9d7-ebf2
-def get_RDW_kenteken_df(limit,offset=0):
+def get_RDW_kenteken_df(limit,offset=0,where=""):
     client = Socrata("opendata.rdw.nl", None)
-    results = client.get("m9d7-ebf2", limit=limit,offset=offset)
+    results = client.get("m9d7-ebf2", limit=limit,offset=offset,where=where)
     results_df = pd.DataFrame.from_records(results)
     return results_df
 
 # https://opendata.rdw.nl/Voertuigen/Open-Data-RDW-Gekentekende_voertuigen_brandstof/8ys7-d773
-def get_RDW_brandstof(limit,offset=0):
+def get_RDW_brandstof(limit,offset=0,where=""):
     client = Socrata("opendata.rdw.nl", None)
-    results = client.get("8ys7-d773", limit=limit,offset=offset)
+    results = client.get("8ys7-d773", limit=limit,offset=offset,where=where)
     results_df = pd.DataFrame.from_records(results)
     return results_df
 
