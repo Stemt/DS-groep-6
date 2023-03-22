@@ -6,10 +6,6 @@ import os
 
 os.chdir(os.path.dirname(__file__))
 
-st.write(os.listdir('.'))
-st.write(os.listdir('./data'))
-
-
 laadpaal_statistiek.laadpaal_stats()
 
 case_3_kaart.kaart()
