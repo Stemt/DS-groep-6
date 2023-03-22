@@ -5,3 +5,4 @@ plotly==5.13.0
 streamlit==1.18.1
 streamlit-folium==0.11.1
 sodapy==2.2.0
+statsmodels==0.13.5
