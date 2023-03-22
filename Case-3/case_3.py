@@ -1,6 +1,11 @@
 import case_3_api as c3api
 import case_3_kaart
 import laadpaal_statistiek
+import os
+
+st.write(os.listdir('.'))
+st.write(os.listdir('./data'))
+
 
 laadpaal_statistiek.laadpaal_stats()
 
