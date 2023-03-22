@@ -1,6 +1,7 @@
 import case_3_api as c3api
 import case_3_kaart
 import laadpaal_statistiek
+import streamlit as st
 import os
 
 st.write(os.listdir('.'))
