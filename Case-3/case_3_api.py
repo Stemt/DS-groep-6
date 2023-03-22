@@ -6,7 +6,7 @@ from sodapy import Socrata
 # oldkey: 93b912b5-9d70-4b1f-960b-fb80a4c9c017
 
 def get_OCM_json(maxresults,key = "acd9617c-3a34-4421-a5d8-6e1edd278a16"):
-    resp = requests.get(f"https://api.openchargemap.io/v3/poi/?output=json&countrycode=NL&maxresults={maxresults}&compact=true&verbose=false&key={key}")
+    resp = requests.get(f"https://api.openchargemap.io/v3/poi/?output=json&countrycode=NL&maxresults={maxresults}&compact=false&verbose=false&key={key}")
     return resp.json()
 
 def get_OCM_df(limit):
