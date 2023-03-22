@@ -4,6 +4,8 @@ import laadpaal_statistiek
 import streamlit as st
 import os
 
+os.chdir(os.path.dirname(__file__))
+
 st.write(os.listdir('.'))
 st.write(os.listdir('./data'))
 
