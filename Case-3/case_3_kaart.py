@@ -12,19 +12,23 @@ def kaart():
     ocm_fix = ocm_fix.dropna(subset='AddressInfo.Town')
 
 
-    st.title("Town based map")
+    st.title("Geografische spreiding van laadstations")
+    st.markdown("""
+    Deze kaart geeft de locaties van laadstations per plaats aan. Ook kan hiermee het vermogen van de laadpalen op de locatie afgelezen worden.
+    """)
+
     towns = ocm_fix.groupby("AddressInfo.Town").count().sort_values('ID',ascending=False)[:100].index.tolist()
 
     # towns = ocm_df['AddressInfo.Town'].dropna()
     # st.write(towns)
 
 
-    towns.insert(1,'All')
-    selected_town = st.selectbox('select town',towns)
+    towns.insert(1,'Alle')
+    selected_town = st.selectbox('Selecteer een plaats of Alle om heel nederland te tonen ',towns)
 
     avg_lat = 52.232385
     avg_lng =  5.270822
-    if selected_town != 'All':
+    if selected_town != 'Alle':
         town_chargers = ocm_fix[ocm_fix['AddressInfo.Town'] == selected_town]
         avg_lat = town_chargers['AddressInfo.Latitude'].sum() / town_chargers['AddressInfo.Latitude'].count()
         avg_lng = town_chargers['AddressInfo.Longitude'].sum() / town_chargers['AddressInfo.Longitude'].count()
@@ -38,9 +42,14 @@ def kaart():
     charger_level_color_map = ['grey','blue','orange','red']
     charger_level_groups = [None,folium.FeatureGroup('Level 1: Low (Under 2kW)'),folium.FeatureGroup('Level 2 : Medium (Over 2kW)'),folium.FeatureGroup('Level 3:  High (Over 40kW)')]
 
+    total = len(ocm_fix)
+    curr = 0
+    map_loading_bar =  st.progress(0)
 
     for row in ocm_fix.iloc:
-        if row['AddressInfo.Town'] != selected_town and selected_town != 'All':
+        map_loading_bar.progress(curr/total)
+        curr += 1
+        if row['AddressInfo.Town'] != selected_town and selected_town != 'Alle':
             continue
         charger_table = pd.json_normalize(row['Connections'])
         if "Level.ID" in charger_table.columns:
@@ -58,7 +67,7 @@ def kaart():
         if group:
             group.add_to(map)
 
+    map_loading_bar.progress(1.0)
     folium.map.LayerControl('topleft',collapsed=False).add_to(map)
-
     folium_static(map,width=800)
 
