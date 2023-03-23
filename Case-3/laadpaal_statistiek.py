@@ -43,12 +43,11 @@ laadpaal_cleaned['Ended'] = pd.to_datetime(laadpaal_cleaned['Ended'])
 # Tijdverschil tussen 'Started' en 'Ended'
 laadpaal_cleaned['TotalTime'] = (laadpaal_cleaned['Ended'] - laadpaal_cleaned['Started']) / pd.Timedelta(hours=1)
 
-# Toevoegen kolom AvgEnergy (W)
-laadpaal_cleaned['AvgEnergy'] = (laadpaal_cleaned['TotalEnergy'] / laadpaal_cleaned['ChargeTime']) 
+# Toevoegen kolom AvgPower (W)
+laadpaal_cleaned['AvgPower'] = (laadpaal_cleaned['TotalEnergy'] / laadpaal_cleaned['ChargeTime']) 
 
 # Filteren op laadsessies waarbij ChargeTime > 0 uur is en  <= 40
 laadpaal_cleaned = laadpaal_cleaned[(laadpaal_cleaned["ChargeTime"] > 0) & (laadpaal_cleaned["ChargeTime"] <= 48) & (laadpaal_cleaned["ConnectedTime"] <= 40)]
-
 
 
 #Bij presentatie laten zien
