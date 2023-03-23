@@ -14,11 +14,11 @@ with st.sidebar:
     ('Merk Statistieken', 'Geografische spreiding van laadstations', 'Laadpaal Statistieken','Trends'))
 
 if page == 'Merk Statistieken':
-    st.write("place holder")
+    merk_trends.merken_grafiek()
 elif page == 'Geografische Spreiding van Laadstations':
     case_3_kaart.kaart()
 elif page == 'Laadpaal Statistieken':
     laadpaal_statistiek.laadpaal_stats()
 elif page == 'Trends':
-    st.write("place holder")
+    regressie_modellen.regressie_modellen()
 
