@@ -14,6 +14,7 @@ def merken_grafiek():
     st.title("Merk Statistieken")
     st.markdown("## Datacleaning Proces")
     st.image("flowchart.png")
+
     #inladen brandstof dataset
     brandstof_elektrisch = c3api.get_RDW_brandstof(limit=3000000,offset=0, where="brandstof_omschrijving='Elektriciteit'")
     #filteren brandstof dataset
