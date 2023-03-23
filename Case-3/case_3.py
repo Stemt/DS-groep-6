@@ -1,6 +1,8 @@
 import case_3_api as c3api
 import case_3_kaart
 import laadpaal_statistiek
+import merk_trends
+import regressie_modellen
 import streamlit as st
 import os
 
@@ -11,7 +13,7 @@ with st.sidebar:
     st.title('Dashboard Populariteit Elektrische Auto\'s')
     page = st.radio(
     "Inhoudsopgave",
-    ('Merk Statistieken', 'Geografische spreiding van laadstations', 'Laadpaal Statistieken','Trends'))
+    ('Merk Statistieken', 'Geografische Spreiding van Laadstations', 'Laadpaal Statistieken','Trends'))
 
 if page == 'Merk Statistieken':
     merk_trends.merken_grafiek()

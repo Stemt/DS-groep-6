@@ -5,6 +5,10 @@ import folium
 from streamlit_folium import folium_static
 
 def kaart():
+    st.title("Geografische spreiding van laadstations")
+    st.markdown("""
+    Deze kaart geeft de locaties van laadstations per plaats aan. Ook kan hiermee het vermogen van de laadpalen op de locatie afgelezen worden.
+    """)
     ocm_json = c3api.get_OCM_json(10000)
     # ocm_json
     ocm_df = pd.json_normalize(ocm_json)
@@ -12,10 +16,6 @@ def kaart():
     ocm_fix = ocm_fix.dropna(subset='AddressInfo.Town')
 
 
-    st.title("Geografische spreiding van laadstations")
-    st.markdown("""
-    Deze kaart geeft de locaties van laadstations per plaats aan. Ook kan hiermee het vermogen van de laadpalen op de locatie afgelezen worden.
-    """)
 
     towns = ocm_fix.groupby("AddressInfo.Town").count().sort_values('ID',ascending=False)[:100].index.tolist()
 
