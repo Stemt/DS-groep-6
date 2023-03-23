@@ -6,11 +6,19 @@ import os
 
 os.chdir(os.path.dirname(__file__))
 
-laadpaal_statistiek.laadpaal_stats()
 
-case_3_kaart.kaart()
+with st.sidebar:
+    st.title('Dashboard Populariteit Elektrische Auto\'s')
+    page = st.radio(
+    "Inhoudsopgave",
+    ('Merk Statistieken', 'Geografische spreiding van laadstations', 'Laadpaal Statistieken','Trends'))
 
+if page == 'Merk Statistieken':
+    st.write("place holder")
+elif page == 'Geografische Spreiding van Laadstations':
+    case_3_kaart.kaart()
+elif page == 'Laadpaal Statistieken':
+    laadpaal_statistiek.laadpaal_stats()
+elif page == 'Trends':
+    st.write("place holder")
 
-print(c3api.get_RDW_brandstof(100).head())
-print(c3api.get_RDW_kenteken_df(100).head())
-print(c3api.get_OCM_df(100).head())

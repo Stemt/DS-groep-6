@@ -10,21 +10,26 @@ def get_OCM_json(maxresults,key = "acd9617c-3a34-4421-a5d8-6e1edd278a16"):
     return resp.json()
 
 def get_OCM_df(limit):
-    responsejson  = get_OCM_json(1000)
+    try:
+        df = pd.read_csv("ocm.csv")
+        return df
+    except:
+        responsejson  = get_OCM_json(1000)
 
 
-    ###Dataframe bevat kolom die een list zijn. 
-    #Met json_normalize zet je de eerste kolom om naar losse kolommen
-    Laadpalen = pd.json_normalize(responsejson)
-    #Daarna nog handmatig kijken welke kolommen over zijn in dit geval Connections
-    #Kijken naar eerst laadpaal op de locatie
-    #Kan je uitpakken middels:
-    df4 = pd.json_normalize(Laadpalen.Connections)
-    df5 = pd.json_normalize(df4[0])
-    df5.head()
-    ###Bestanden samenvoegen
-    Laadpalen = pd.concat([Laadpalen, df5], axis=1)
-    return Laadpalen
+        ###Dataframe bevat kolom die een list zijn. 
+        #Met json_normalize zet je de eerste kolom om naar losse kolommen
+        Laadpalen = pd.json_normalize(responsejson)
+        #Daarna nog handmatig kijken welke kolommen over zijn in dit geval Connections
+        #Kijken naar eerst laadpaal op de locatie
+        #Kan je uitpakken middels:
+        df4 = pd.json_normalize(Laadpalen.Connections)
+        df5 = pd.json_normalize(df4[0])
+        df5.head()
+        ###Bestanden samenvoegen
+        Laadpalen = pd.concat([Laadpalen, df5], axis=1)
+        Laadpalen.to_csv('ocm.csv')
+        return Laadpalen
 
 # https://opendata.rdw.nl/Voertuigen/Open-Data-RDW-Gekentekende_voertuigen/m9d7-ebf2
 def get_RDW_kenteken_df(limit,offset=0,where=""):
