@@ -10,10 +10,6 @@ def laadpaal_stats():
 
     st.title("Laadpaaldata inzichten van elektrische auto's")
 
-    #FlowChart Data Cleaning laadpaaldata
-
-    #st.image()
-
     #DATA CLEANING - HANNA
     laadpaal = pd.read_csv("data/laadpaaldata.csv")
     print(laadpaal)
@@ -42,33 +38,31 @@ def laadpaal_stats():
     # Tijdverschil tussen 'Started' en 'Ended'
     laadpaal_cleaned['TotalTime'] = (laadpaal_cleaned['Ended'] - laadpaal_cleaned['Started']) / pd.Timedelta(hours=1)
 
-    # Toevoegen kolom AvgEnergy (W)
-    laadpaal_cleaned['AvgEnergy'] = (laadpaal_cleaned['TotalEnergy'] / laadpaal_cleaned['ChargeTime']) 
+    # Toevoegen kolom AvgPower (W)
+    laadpaal_cleaned['AvgPower'] = (laadpaal_cleaned['TotalEnergy'] / laadpaal_cleaned['ChargeTime']) 
 
     # Filteren op laadsessies waarbij ChargeTime > 0 uur is en  <= 40
     laadpaal_cleaned = laadpaal_cleaned[(laadpaal_cleaned["ChargeTime"] > 0) & (laadpaal_cleaned["ChargeTime"] <= 48) & (laadpaal_cleaned["ConnectedTime"] <= 40)]
 
-
+    laadpaal_cleaned['Started'] = pd.to_datetime(laadpaal_cleaned['Started'])
+    laadpaal_cleaned['Ended'] = pd.to_datetime(laadpaal_cleaned['Ended'])
 
     #Bij presentatie laten zien
     st.header('Inzichten ophalen')
+
+    st.subheader('Laadpaal data')
+    st.markdown('Om de laadpaal data voor te bereiden op analyse, is er eerst data cleaning toegepast. Ontbrekende data werd geïdentificeerd en aangevuld of verwijderd. Eventuele duplicaten uit de dataset zijn verwijderd en foutieve data, zoals onjuiste datums, is gefilterd. Daarbij is vooral gekeken naar de verwerking van schrikkeljaren. Daarnaast zijn er visualisaties gecreëerd om meer inzicht te krijgen in de data.')
+
+    st.dataframe(laadpaal_cleaned)
+
+    st.subheader('Verband laadsnelheid en vermogen')
     st.markdown("Uit de scatterplot kan worden afgeleid dat er een duidelijk verband bestaat tussen de laadsnelheid van elektrische auto's en het bijbehorende vermogen. Bij een snelle laadtijd wordt over het algemeen een hoog vermogen gebruikt, terwijl er bij een langere laadtijd juist sprake is van een lager vermogen. Deze bevindingen zijn gemakkelijk af te lezen uit de grafiek en bieden waardevolle inzichten in de relatie tussen laadsnelheid en vermogen van elektrische auto's.")
-
-    #max_power = laadpaal_cleaned["MaxPower"]
-    #charge_time = laadpaal_cleaned["ChargeTime"]
-
-    #plt.scatter(max_power, charge_time, color='pink')
-    #plt.title("Relatie tussen laadtijd en vermogen")
-    #plt.xlabel("Max vermogen (Watt)")
-    #plt.ylabel("Laadtijd (Uren)")
-    #st.pyplot()
 
     fig = px.scatter(laadpaal_cleaned, x="MaxPower", y="ChargeTime", labels={"MaxPower": "Max vermogen (Watt)", "ChargeTime": "Laadtijd (Uren)"}, trendline="ols", trendline_scope="overall")
 
     fig.update_traces(marker=dict(color='purple'), line=dict(color='black'))
 
     st.plotly_chart(fig)
-
 
 
     #HISTOGRAM - HANNA
