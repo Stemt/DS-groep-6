@@ -44,7 +44,11 @@ def merken_grafiek():
 
     filtered_top5_df = top5_df[(top5_df["jaar"] >= 2000) & (top5_df["jaar"] <= 2022)]
 
-    aantal_merk = filtered_top5_df.groupby(["merk","jaar"]).size().reset_index(name = "aantallen")
+    aantal_merk = filtered_top5_df.groupby(["merk","jaar", "maand"]).size().reset_index(name = "aantallen")
+    def year_month_to_date(row):
+        return f"{row['jaar']}-{row['maand']}"
+
+    aantal_merk["datum"] = pd.to_datetime(aantal_merk.apply(year_month_to_date,axis=1),format='%Y-%m')
 
     df = aantal_merk
 
@@ -54,13 +58,13 @@ def merken_grafiek():
     traces = []
     for brand in df['merk'].unique():
         brand_data = df[df['merk'] == brand]
-        trace = go.Scatter(x=brand_data['jaar'], y=brand_data['aantallen'],
+        trace = go.Scatter(x=brand_data['datum'], y=brand_data['aantallen'],
                             mode='lines', name=brand, line=dict(color=color_map[brand]))
         traces.append(trace)
 
     #layout
     layout = go.Layout(title='Voertuig aantallen per merk per jaar',
-                   xaxis=dict(title='Jaar', tickmode = "linear", dtick = 1),
+                   xaxis=dict(title='Datum'),
                    yaxis=dict(title='Aantal voertuigen'),
                    xaxis_rangeslider_visible=True)
 
