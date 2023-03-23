@@ -12,8 +12,7 @@ def get_OCM_json(maxresults,key = "acd9617c-3a34-4421-a5d8-6e1edd278a16"):
 def get_OCM_df(limit):
     try:
         df = pd.read_csv("ocm.csv")
-        if len(df) != limit:
-            raise RunTimeError("df does not match")
+        return df
     except:
         responsejson  = get_OCM_json(1000)
 
