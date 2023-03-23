@@ -4,17 +4,18 @@ from sodapy import Socrata
 
 
 # oldkey: 93b912b5-9d70-4b1f-960b-fb80a4c9c017
-
-ocm_df = None
-rdw_kenteken_df = None
-rdw_brandstof_df = None
+print("loading api")
+ocm_df = []
+rdw_kenteken_df = []
+rdw_brandstof_df = []
 
 def get_OCM_json(maxresults,key = "acd9617c-3a34-4421-a5d8-6e1edd278a16"):
     resp = requests.get(f"https://api.openchargemap.io/v3/poi/?output=json&countrycode=NL&maxresults={maxresults}&compact=false&verbose=false&key={key}")
     return resp.json()
 
 def get_OCM_df(limit):
-    if ocm_df:
+    global ocm_df
+    if len(ocm_df) > 0:
         return ocm_df
     responsejson  = get_OCM_json(1000)
 
@@ -36,7 +37,8 @@ def get_OCM_df(limit):
 
 # https://opendata.rdw.nl/Voertuigen/Open-Data-RDW-Gekentekende_voertuigen/m9d7-ebf2
 def get_RDW_kenteken_df(limit,offset=0,where="",select="",order=""):
-    if rdw_kenteken_df:
+    global rdw_kenteken_df
+    if len(rdw_kenteken_df) > 0:
         return rdw_kenteken_df
     client = Socrata("opendata.rdw.nl", None)
     results = client.get("m9d7-ebf2", limit=limit,offset=offset,where=where,select=select,order=order)
@@ -47,7 +49,8 @@ def get_RDW_kenteken_df(limit,offset=0,where="",select="",order=""):
 
 # https://opendata.rdw.nl/Voertuigen/Open-Data-RDW-Gekentekende_voertuigen_brandstof/8ys7-d773
 def get_RDW_brandstof(limit,offset=0,where="", select=""):
-    if rdw_brandstof_df:
+    global rdw_brandstof_df
+    if len(rdw_brandstof_df) > 0:
         return rdw_brandstof_df
     client = Socrata("opendata.rdw.nl", None)
     results = client.get("8ys7-d773", limit=limit,offset=offset,where=where,select=select)
