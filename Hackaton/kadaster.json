@@ -1,0 +1,20 @@
+{
+    "timeliness": [
+        {
+            "featuretype": "perceel",
+            "datetimeTo": "2023-03-26T21:59:59Z"
+        },
+        {
+            "featuretype": "kadastralegrens",
+            "datetimeTo": "2023-03-26T21:59:59Z"
+        },
+        {
+            "featuretype": "pand",
+            "datetimeTo": "2023-02-28T23:30:00Z"
+        },
+        {
+            "featuretype": "openbareruimtelabel",
+            "datetimeTo": "2023-02-28T23:30:00Z"
+        }
+    ]
+}
